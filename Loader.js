@@ -1,15 +1,20 @@
+const _loadedToObj = (loaded) =>
+{
+    const obj = {};
+    loaded.forEach(l => obj[l.value.key.toString()] = l.value.value);
+    return obj;
+}
+
 export default class Loader
 {
     steps = [];
-    results = [];
 
     /**
-     * Loads the steps asynchronously, putting the returns into an array
+     * Loads the steps asynchronously, putting the returns into an array.
+     * Can load multiple paths of ordered steps at the same time
     */
-    load()
+    async load()
     {
-        this.results = [];
-
         const promiseSteps = this.steps.map(step => {
             return new Promise(async (resolve) => {
                 const returns = [];
@@ -23,7 +28,7 @@ export default class Loader
             });
         });
         this.steps = [];
-        return Promise.allSettled(promiseSteps);
+        return _loadedToObj(await Promise.allSettled(promiseSteps));
     }
 
     /**
